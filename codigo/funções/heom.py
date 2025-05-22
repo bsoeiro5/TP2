@@ -11,32 +11,16 @@ class HEOMImputer(BaseEstimator, TransformerMixin):
     realizando imputação baseada nos k vizinhos mais próximos.
     """
     def __init__(self, k=5, categorical_features=None, normalize=True):
-        """
-        Inicializa o HEOMImputer.
-
-        Parâmetros:
-            k (int): Número de vizinhos mais próximos para usar na imputação
-            categorical_features (list): Lista dos índices de colunas categóricas
-            normalize (bool): Se deve normalizar características numéricas
-        """
         self.k = k
         self.categorical_features = categorical_features if categorical_features is not None else []
         self.normalize = normalize
-        self.scaler = MinMaxScaler() if normalize else None
         self.numerical_features = None
         self.X_fitted = None
+        # Armazenar min e max para cada coluna numérica para normalização manual
+        self.min_values = {}
+        self.max_values = {}
         
     def fit(self, X, y=None):
-        """
-        Memoriza o conjunto de dados para ser usado na imputação posteriormente.
-        
-        Parâmetros:
-            X (pandas.DataFrame): Conjunto de dados de treinamento
-            y: Ignorado
-        
-        Retorna:
-            self
-        """
         # Converter para DataFrame se for numpy array
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
@@ -47,114 +31,127 @@ class HEOMImputer(BaseEstimator, TransformerMixin):
         # Armazenar os dados originais
         self.X_fitted = X.copy()
         
-        # Calcular os intervalos de valores para normalização na distância
-        if self.normalize:
-            numeric_data = X.iloc[:, self.numerical_features].values
-            self.scaler.fit(numeric_data)
+        # Calcular min e max para cada coluna numérica para normalização manual
+        if self.normalize and len(self.numerical_features) > 0:
+            for i in self.numerical_features:
+                col_data = X.iloc[:, i].dropna()
+                self.min_values[i] = col_data.min()
+                self.max_values[i] = col_data.max()
             
         return self
     
+    def _normalize_value(self, value, feature_idx):
+        """Normaliza um valor único com base no min e max da feature."""
+        min_val = self.min_values.get(feature_idx, 0)
+        max_val = self.max_values.get(feature_idx, 1)
+        range_val = max_val - min_val
+        
+        if range_val == 0:
+            return 0  # Evitar divisão por zero
+        
+        return (value - min_val) / range_val
+    
     def _heom_distance(self, instance1, instance2):
-        """
-        Calcula a distância HEOM entre duas instâncias.
-        
-        HEOM trata valores numéricos e categóricos de forma diferente:
-        - Para numéricos: Distância euclidiana normalizada
-        - Para categóricos: 0 se iguais, 1 se diferentes ou se um valor está faltando
-        
-        Parâmetros:
-            instance1 (array-like): Primeira instância
-            instance2 (array-like): Segunda instância
-            
-        Retorna:
-            float: Distância HEOM entre as instâncias
-        """
         squared_sum = 0.0
+        n_features = 0  # Contador para normalizar a distância
         
         # Processar atributos categóricos
         for i in self.categorical_features:
+            n_features += 1
             # Verificar se algum dos valores é nulo
-            if pd.isna(instance1[i]) or pd.isna(instance2[i]):
+            if pd.isna(instance1.iloc[i]) or pd.isna(instance2.iloc[i]):
                 squared_sum += 1.0  # Distância máxima se um é nulo
-            elif instance1[i] == instance2[i]:
+            elif instance1.iloc[i] == instance2.iloc[i]:
                 squared_sum += 0.0  # Mesma categoria
             else:
                 squared_sum += 1.0  # Categorias diferentes
         
         # Processar atributos numéricos
         for i in self.numerical_features:
+            n_features += 1
             # Verificar se algum dos valores é nulo
-            if pd.isna(instance1[i]) or pd.isna(instance2[i]):
+            if pd.isna(instance1.iloc[i]) or pd.isna(instance2.iloc[i]):
                 squared_sum += 1.0  # Distância máxima se um é nulo
             else:
-                # Normalização no intervalo [0,1] se self.normalize for True
-                if self.normalize:
-                    val1 = self.scaler.transform([[instance1[i]]])[0][0]
-                    val2 = self.scaler.transform([[instance2[i]]])[0][0]
-                    squared_sum += (val1 - val2) ** 2
-                else:
-                    squared_sum += ((instance1[i] - instance2[i]) ** 2)
+                try:
+                    val1 = float(instance1.iloc[i])
+                    val2 = float(instance2.iloc[i])
+                    
+                    if self.normalize:
+                        # Normalizar manualmente cada valor
+                        val1_norm = self._normalize_value(val1, i)
+                        val2_norm = self._normalize_value(val2, i)
+                        squared_sum += (val1_norm - val2_norm) ** 2
+                    else:
+                        squared_sum += (val1 - val2) ** 2
+                except:
+                    squared_sum += 1.0  # Usar distância máxima em caso de erro
         
-        return np.sqrt(squared_sum)
+        # Normalizar a distância pelo número de atributos
+        if n_features > 0:
+            return np.sqrt(squared_sum / n_features)
+        return 0.0
     
     def _find_k_neighbors(self, instance, X_without_nan):
         """
         Encontra os k vizinhos mais próximos para uma instância com base na distância HEOM.
-        
-        Parâmetros:
-            instance (array-like): Instância para encontrar vizinhos
-            X_without_nan (pandas.DataFrame): Conjunto de dados sem valores NaN
-            
-        Retorna:
-            list: Índices dos k vizinhos mais próximos
         """
         distances = []
         
-        for i, row in X_without_nan.iterrows():
-            distance = self._heom_distance(instance, row)
-            distances.append((i, distance))
-            
+        for idx, row in X_without_nan.iterrows():
+            try:
+                distance = self._heom_distance(instance, row)
+                distances.append((idx, distance))
+            except:
+                pass  # Ignorar erros silenciosamente
+        
         # Ordenar por distância e retornar os k mais próximos
         distances.sort(key=lambda x: x[1])
-        neighbors = [idx for idx, _ in distances[:self.k]]
+        k_adjusted = min(self.k, len(distances))  # Ajustar k se não houver vizinhos suficientes
+        neighbors = [idx for idx, _ in distances[:k_adjusted]]
         
         return neighbors
     
     def _impute_value(self, instance, feature_idx, X_without_nan):
         """
         Imputa um valor para um atributo específico com base nos k vizinhos mais próximos.
-        
-        Parâmetros:
-            instance (array-like): Instância com valor faltante
-            feature_idx (int): Índice do atributo a ser imputado
-            X_without_nan (pandas.DataFrame): Conjunto de dados sem valores NaN
-            
-        Retorna:
-            valor imputado para o atributo
         """
-        # Encontrar os k vizinhos mais próximos
-        neighbors = self._find_k_neighbors(instance, X_without_nan)
-        
-        # Obter valores dos vizinhos para o atributo específico
-        neighbor_values = X_without_nan.iloc[neighbors, feature_idx].values
-        
-        # Imputar diferentemente para atributos categóricos e numéricos
-        if feature_idx in self.categorical_features:
-            # Para categórico, usar o valor mais frequente (moda)
-            return mode(neighbor_values).mode[0]
-        else:
-            # Para numérico, usar a média
-            return np.mean(neighbor_values)
+        try:
+            # Encontrar os k vizinhos mais próximos
+            neighbors = self._find_k_neighbors(instance, X_without_nan)
+            
+            if not neighbors:
+                # Retornar a média/moda global como fallback
+                if feature_idx in self.categorical_features:
+                    return X_without_nan.iloc[:, feature_idx].mode().iloc[0]
+                else:
+                    return X_without_nan.iloc[:, feature_idx].mean()
+            
+            # Obter valores dos vizinhos para o atributo específico
+            neighbor_values = X_without_nan.iloc[neighbors, feature_idx].values
+            
+            # Imputar diferentemente para atributos categóricos e numéricos
+            if feature_idx in self.categorical_features:
+                # Para categórico, usar o valor mais frequente (moda)
+                try:
+                    # Tente usar a versão mais recente (scipy >= 1.9.0)
+                    return mode(neighbor_values, keepdims=False)[0]
+                except:
+                    # Fallback para versões mais antigas do scipy
+                    return mode(neighbor_values)[0][0]
+            else:
+                # Para numérico, usar a média
+                return np.mean(neighbor_values)
+        except:
+            # Retornar a média/moda global como fallback
+            if feature_idx in self.categorical_features:
+                return X_without_nan.iloc[:, feature_idx].mode().iloc[0]
+            else:
+                return X_without_nan.iloc[:, feature_idx].mean()
     
     def transform(self, X):
         """
         Imputa valores ausentes usando a métrica HEOM e vizinhos mais próximos.
-        
-        Parâmetros:
-            X (pandas.DataFrame): Conjunto de dados com valores ausentes
-            
-        Retorna:
-            pandas.DataFrame: Conjunto de dados com valores imputados
         """
         # Converter para DataFrame se for numpy array
         if isinstance(X, np.ndarray):
@@ -167,8 +164,8 @@ class HEOMImputer(BaseEstimator, TransformerMixin):
         X_without_nan = self.X_fitted.dropna()
         
         # Verificar se temos exemplos suficientes sem NaN
-        if len(X_without_nan) < self.k:
-            raise ValueError(f"Apenas {len(X_without_nan)} instâncias sem NaN disponíveis, mas k={self.k}. Reduza k ou forneça mais dados.")
+        if len(X_without_nan) < 1:
+            raise ValueError("Não há instâncias sem NaN disponíveis para referência na imputação.")
         
         # Para cada linha com valores ausentes
         for idx, row in X.iterrows():
@@ -177,21 +174,17 @@ class HEOMImputer(BaseEstimator, TransformerMixin):
                 na_columns = row.index[row.isna()]
                 
                 for col_name in na_columns:
-                    col_idx = X.columns.get_loc(col_name)
-                    # Impute o valor ausente
-                    X_imputed.loc[idx, col_name] = self._impute_value(row, col_idx, X_without_nan)
+                    try:
+                        col_idx = X.columns.get_loc(col_name)
+                        # Impute o valor ausente
+                        X_imputed.loc[idx, col_name] = self._impute_value(row, col_idx, X_without_nan)
+                    except Exception as e:
+                        pass  # Ignorar erros silenciosamente
                     
         return X_imputed
     
     def fit_transform(self, X, y=None):
         """
         Método de conveniência para ajustar o imputer e aplicar transformação.
-        
-        Parâmetros:
-            X (pandas.DataFrame): Conjunto de dados com valores ausentes
-            y: Ignorado
-            
-        Retorna:
-            pandas.DataFrame: Conjunto de dados com valores imputados
         """
         return self.fit(X).transform(X)
