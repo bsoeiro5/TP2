@@ -112,23 +112,5 @@ As bibliotecas principais são:
 - streamlit 1.32.0
 - altair 5.0.1
 
-Nota: As restantes bibliotecas utilizadas e as suas versões podem ser encontradas em requirements.txt, ou instalando o ambiente virtual como instruído acima e executando o comando `conda list`.
 
-## Avaliação do Projeto
 
-O projeto será avaliado de acordo com os seguintes critérios:
-
-- **Envolvimento dos Estudantes (10%):** Contribuição e participação no projeto.
-- **Qualidade da Apresentação (10%):** Qualidade da apresentação entregue pelos estudantes, domínio sobre os objetivos, metodologia, resultados e conclusões do projeto.
-- **Qualidade do Jupyter Notebook (10%):** Qualidade da implementação e discussão de insights.
-- **Caracterização dos Dados (10%):** Compreensão dos tipos de features e características gerais do dataset.
-- **Avaliação da Qualidade dos Dados e Pré-processamento (20%):** Exploração de métodos de seleção, transformação e engenharia de features, identificação de problemas de qualidade nos dados e aplicação de técnicas adequadas para os resolver.
-- **Visualização de Dados (15%):** Exploração visual dos dados e produção de insights significativos a partir das visualizações escolhidas.
-- **Aprendizagem Supervisionada (20%):** Exploração de algoritmos de classificação adequados e interpretação de métricas de desempenho.
-- **Pensamento Crítico e Comunicação de Resultados (10%):** Análise da informação obtida e partilha de insights sobre o domínio do problema.
-- **Elementos Extra (10%):** Métodos criativos que vão além do âmbito do projeto, seja teóricos ou práticos.
-
-## Bibliografia
-
-1. UC Irvine Machine Learning Repository. Student Performance, https://archive.ics.uci.edu/dataset/320/student+performance
-2. Cortez, P., & Silva, A. M. G. (2008). "Using data mining to predict secondary school student performance". https://repositorium.sdum.uminho.pt/bitstream/1822/8024/1/student.pdf
