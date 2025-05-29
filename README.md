@@ -63,7 +63,7 @@ OU
 Abrir terminal (CMD, PowerShell, Anaconda Prompt, ou outros que reconheçam o comando conda), navegar até a pasta onde deseja instalar o repositório, e introduzir o seguinte código:
 
 ```
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/bsoeiro5/TP2.git
 ```
 
 ### Segundo passo
