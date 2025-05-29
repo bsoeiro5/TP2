@@ -5,8 +5,8 @@ Trabalho realizado por:
 *Franciso Machado (FCUP_IACD_202403514)
 
 
-![FCUP](fotos/FCUP.png)
-![FEUP](fotos/FEUP.png)
+![FCUP](fotos/Cienciasporto.png)
+![FEUP](fotos/Feuporto.png)
 
 
 
