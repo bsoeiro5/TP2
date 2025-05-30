@@ -14,15 +14,16 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
+import requests
+from io import StringIO
 
 st.set_page_config(layout="wide")
 
 st.title("Student Performance Dashboard")
 
-# Carregar dados
-import os
-file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'student-data.csv')
-df = pd.read_csv(file_path)
+url = 'https://raw.githubusercontent.com/[username]/[repository]/main/[file].csv'
+response = requests.get(url)
+pd.read_csv(StringIO(response.text))
  
 df['passed'] = df['passed'].map({'yes': 1, 'no': 0})
 
