@@ -20,7 +20,10 @@ st.set_page_config(layout="wide")
 st.title("Student Performance Dashboard")
 
 # Carregar dados
-df = pd.read_csv('student-data.csv')  
+import os
+file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'student-data.csv')
+df = pd.read_csv(file_path)
+ 
 df['passed'] = df['passed'].map({'yes': 1, 'no': 0})
 
 # Criar versão numérica do dataframe para análise
