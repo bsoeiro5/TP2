@@ -21,7 +21,7 @@ st.set_page_config(layout="wide")
 
 st.title("Student Performance Dashboard")
 
-url = 'https://github.com/bsoeiro5/TP2/blob/849beafb7355f38cc8a23b1bab123009b9e9a82f/codigo/student-data.csv'
+url = 'https://raw.githubusercontent.com/bsoeiro5/TP2/refs/heads/main/codigo/student-data.csv'
 response = requests.get(url)
 pd.read_csv(StringIO(response.text))
  
