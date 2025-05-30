@@ -1,7 +1,7 @@
 # Sistema de Previsão de Desempenho Académico
 Trabalho realizado por:
-Àlvaro Castro (FCUP_IACD:202405722) 
-Bernardo Soeiro (FCUP_IACD:2024    ) 
+Álvaro Castro (FCUP_IACD:202405722) 
+Bernardo Soeiro (FCUP_IACD:202406233) 
 Franciso Machado (FCUP_IACD_202403514)
 
 
@@ -38,7 +38,7 @@ Reprodutibilidade: a criação de um ficheiro requirements.txt facilita a partil
 
 Gestão de versões: pela simplicidade da ferramenta conda, torna-se fácil instalar e manter diferentes versões de bibliotecas para cada projeto, sem nunca correr o risco de causar conflitos de dependências;
 
-Leveza: a transmissão e instalação do ambiente é facilitada com o ficheiro requirements.txt sendo portanto apenas necessários menos que 30 KB de espaço livre em disco para obter a lista detalhada com todas as bibliotecas utilizadas.
+Tamanho dos ficheiros: a transmissão e instalação do ambiente é facilitada com o ficheiro requirements.txt sendo portanto apenas necessários menos que 30 KB de espaço livre em disco para obter a lista detalhada com todas as bibliotecas utilizadas.
 
 ## Etapas do Projeto
 
