@@ -16,7 +16,7 @@ Franciso Machado (FCUP_IACD_202403514)
 
 O objetivo deste projeto é desenvolver um sistema de intervenção para estudantes, baseado no conjunto de dados UCI Student Performance. Pretende-se construir um pipeline de machine learning capaz de prever se um estudante passará no exame final (`passed` = 'yes'), permitindo a identificação precoce de alunos que necessitam de atenção e suporte adicional.
 
-Este trabalho foi desenvolvido no âmbito da unidade curricular de Extração de Informação e Análise de Conhecimento em Dados (EIACD), seguindo as diretrizes do Trabalho Prático 2 para o ano letivo 2024/2025.
+Este trabalho foi desenvolvido no âmbito da unidade curricular de Elementos de Inteligência Artificial e Ciências de Dados (EIACD), seguindo as diretrizes do Trabalho Prático 2 para o ano letivo 2024/2025.
 
 ## Streamlit
 
