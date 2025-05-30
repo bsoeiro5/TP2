@@ -1,7 +1,7 @@
 # Sistema de Previsão de Desempenho Académico
 Trabalho realizado por:
-Àlvaro Castro (FCUP_IACD:202405722)
-Bernardo Soeiro (FCUP_IACD:2024    )
+Àlvaro Castro (FCUP_IACD:202405722) 
+Bernardo Soeiro (FCUP_IACD:2024    ) 
 Franciso Machado (FCUP_IACD_202403514)
 
 
