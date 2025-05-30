@@ -20,7 +20,7 @@ Este trabalho foi desenvolvido no âmbito da unidade curricular de Elementos de 
 
 ## Streamlit
 
-Para visitar a aplicação Streamlit onde está documentado todo o processo, auxiliado por gráficos relevantes ao projeto, ([clica aqui](https://ketqtv8t6re4ry4mzd4zif.streamlit.app/)).
+Para visitar a aplicação Streamlit onde está documentado todo o processo ([clica aqui](https://ketqtv8t6re4ry4mzd4zif.streamlit.app/)).
 
 ## Como opera o programa
 
