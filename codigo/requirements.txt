@@ -1,7 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
-https://repo.anaconda.com/pkgs/main/win-64/git-2.45.2-haa95532_1.conda
+# https://repo.anaconda.com/pkgs/main/win-64/git-2.45.2-haa95532_1.conda
 https://conda.anaconda.org/conda-forge/win-64/_py-xgboost-mutex-2.0-gpu_0.conda
 https://repo.anaconda.com/pkgs/main/win-64/blas-1.0-mkl.conda
 https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.4.26-h4c7d964_0.conda
