@@ -21,14 +21,14 @@ st.set_page_config(layout="wide")
 
 st.title("Student Performance Dashboard")
 
-url = 'https://raw.githubusercontent.com/[username]/[repository]/main/[file].csv'
+url = 'https://github.com/bsoeiro5/TP2/blob/849beafb7355f38cc8a23b1bab123009b9e9a82f/codigo/student-data.csv'
 response = requests.get(url)
 pd.read_csv(StringIO(response.text))
  
 df['passed'] = df['passed'].map({'yes': 1, 'no': 0})
 
 # Criar versão numérica do dataframe para análise
-ndf = pd.read_csv('student-data.csv')
+ndf = pd.read_csv(StringIO(response.text))
 ndf['passed'] = ndf['passed'].map({'yes': 1, 'no': 0})
 ndf['school'] = ndf['school'].map({'GP': 1, 'MS': 0})
 ndf['sex'] = ndf['sex'].map({'F': 1, 'M': 0})
